@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: PonyVille-Management_Test
+    #配置数据库连接信息
+  datasource:
+    #使用springboot官方的追光者连接池
+    #type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://mysql:3306/ponyvilleapp
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 200519
+  servlet:
+    multipart:
+      #单个文件最大值
+      max-file-size: 100MB
+      #包含表单数据和所有文件的最大值
+      max-request-size: 100MB
+#配置事务管理日志级别为debug
+logging:
+  level:
+    org.springframework.transaction: debug
+mybatis:
+  configuration:
+    #开启下划线转驼峰
+    map-underscore-to-camel-case: true
+    #配置日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#配置文件路径参数
+fangxiong:
+  file:
+    path: localhost/Users/fangxiong/Documents/Images

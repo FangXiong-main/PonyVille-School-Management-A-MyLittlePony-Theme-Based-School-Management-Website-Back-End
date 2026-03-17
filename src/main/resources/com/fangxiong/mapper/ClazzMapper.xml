@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangxiong.mapper.ClazzMapper">
+<!--    分页查询班级管理-->
+    <select id="pageInfo" resultType="com.fangxiong.pojo.Clazz">
+        select
+        c.*,e.name masterName
+        from clazz c
+        left join emp e on c.master_id = e.id
+        <where>
+            <if test="name != null and name!=''">
+                c.name like concat('%',#{name},'%')
+            </if>
+            <if test="begin !=null and end != null">
+                and c.end_date between #{begin} and #{end}
+            </if>
+        </where>
+    </select>
+</mapper>

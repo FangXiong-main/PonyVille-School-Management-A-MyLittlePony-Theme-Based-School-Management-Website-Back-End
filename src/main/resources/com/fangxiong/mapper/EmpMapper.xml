@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangxiong.mapper.EmpMapper">
+<!--    id 属性值用于指定方法名-->
+    <select id="page" resultType="com.fangxiong.pojo.Emp">
+        SELECT e.*, d.name AS deptName
+        FROM emp e
+        LEFT JOIN dept d ON e.dept_id = d.id
+<!--        使用动态sql确保功能完整性，增强用户体验-->
+        <where>
+            <if test="name != null and name != ''">
+                AND e.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="gender != null">
+                AND e.gender = #{gender}
+            </if>
+            <if test="begin != null and end != null">
+                AND e.entry_date BETWEEN #{begin} AND #{end}
+            </if>
+        </where>
+        ORDER BY e.update_time DESC
+    </select>
+<!--    删除员工信息-->
+    <delete id="deleteById">
+        delete from emp where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+<!--    查询回显-->
+<!--    因为返回的数据过于复杂，需要手动配置resultMap指定封装-->
+    <resultMap id="empResultMap" type="com.fangxiong.pojo.Emp">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="name" column="name"/>
+        <result property="gender" column="gender"/>
+        <result property="phone" column="phone"/>
+        <result property="job" column="job"/>
+        <result property="salary" column="salary"/>
+        <result property="image" column="image"/>
+        <result property="entryDate" column="entry_date"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="deptName" column="dept_Name"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+<!--        List集合使用collection配置封装-->
+        <collection property="exprList" ofType="com.fangxiong.pojo.EmpExpr">
+            <id property="id" column="ee_id"/>
+            <result property="begin" column="ee_expr_begin"/>
+            <result property="end" column="ee_expr_end"/>
+            <result property="company" column="ee_expr_company"/>
+            <result property="job" column="ee_expr_job"/>
+            <result property="empId" column="ee_expr_emp_id"/>
+        </collection>
+    </resultMap>
+    <select id="getById" resultMap="empResultMap">
+        select
+        e.*,
+        ee.id as ee_id,
+        ee.begin as ee_expr_begin,
+        ee.end as ee_expr_end,
+        ee.company as ee_expr_company,
+        ee.job as ee_expr_job,
+        ee.emp_id as ee_expr_emp_id
+        from emp e
+        left join emp_expr ee on e.id = ee.emp_id where e.id = #{id}
+    </select>
+<!--    查询各个岗位对应的员工人数-->
+    <select id="countByJob" resultType="java.util.Map">
+        select
+        j.job_name pos,
+        count(*) num
+        from emp left join job as j on emp.job = j.id  group by job order by num;
+    </select>
+<!--    依据员工性别统计数据-->
+    <select id="countByGender" resultType="map">
+        select
+        if(gender=1,'男性员工','女性员工') name,
+        count(*) value
+        from emp group by gender;
+    </select>
+    <!--    更新员工信息-->
+    <update id="update">
+        update emp
+<!--        set标签会自动生成set关键字，自动删除掉更新字段后多余的逗号-->
+        <set>
+            <if test="username != null">
+                username = #{username},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="gender != null">
+                gender = #{gender},
+            </if>
+            <if test="phone != null">
+                phone = #{phone},
+            </if>
+            <if test="job != null">
+                job = #{job},
+            </if>
+            <if test="image !=null">
+                image = #{image},
+            </if>
+            <if test="entryDate != null">
+                entry_date = #{entryDate},
+            </if>
+            <if test="deptId != null">
+                dept_id = #{deptId},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

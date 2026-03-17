@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangxiong.mapper.StudentMapper">
+<!--    批量删除学生信息-->
+    <delete id="delete">
+        delete from student where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <!--    分页查询学员信息-->
+    <select id="pageInfo" resultType="com.fangxiong.pojo.Student">
+        select
+        s.*,c.name clazzName
+        from student s
+        left join clazz c on s.clazz_id = c.id
+        <where>
+            <if test="name != null and name != ''">
+                and s.name like concat('%',#{name},'%')
+            </if>
+            <if test="degree != null and degree != ''">
+                and s.degree >= #{degree}
+            </if>
+            <if test="clazzId != null and clazzId !=''">
+                and s.clazz_id = #{clazzId}
+            </if>
+        </where>
+    </select>
+<!--    统计学员学历信息-->
+    <select id="getStudentDegreeData" resultType="map">
+        select
+        (case when degree=1 then '初中'
+        when degree=2 then '高中'
+        when degree=3 then '大专'
+        when degree=4 then '本科'
+        when degree=5 then '硕士'
+        when degree=6 then '博士' else '其他' end) name
+        ,count(*) value
+        from student
+        group by degree
+    </select>
+<!--    统计各个班级的学生人数-->
+    <select id="getStudentCountData" resultType="java.util.Map">
+        select
+        ifnull(c.name,'其他') clazzList,count(*) dataList
+        from student s left join clazz c on s.clazz_id = c.id group by c.name order by dataList desc ;
+    </select>
+</mapper>

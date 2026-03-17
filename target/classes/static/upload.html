@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>上传文件</title>
+</head>
+<body>
+<!--    上传图片等文件的时候要设置enctype属性为"multipart/form-data"否则只会上传文件的文件名-->
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        姓名: <input type="text" name="name"><br>
+        年龄: <input type="text" name="age"><br>
+        头像: <input type="file" name="file"><br>
+        <input type="submit" value="提交">
+    </form>
+
+</body>
+</html>
